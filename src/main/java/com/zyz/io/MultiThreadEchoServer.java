@@ -26,10 +26,12 @@ public class MultiThreadEchoServer {
             BufferedReader is = null;
             PrintWriter os = null;
             try{
+
                 is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 os = new PrintWriter(clientSocket.getOutputStream(),true);
                 String inputLine = null;
                 long startTimeMillis = System.currentTimeMillis();
+                //当对输出流进行读取时，会阻塞直到读完
                 while (null!=(inputLine=is.readLine())){
                     os.println(inputLine);
                 }
@@ -53,7 +55,7 @@ public class MultiThreadEchoServer {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ServerSocket echoService = null;
         Socket clientSocket = null;
         try{
@@ -62,13 +64,21 @@ public class MultiThreadEchoServer {
             e.printStackTrace();
         }
         System.out.println("echoService init ...");
-        while (true){
-            try{
-                clientSocket = echoService.accept();
-                System.out.println(clientSocket.getRemoteSocketAddress()+"connect!");
-                tp.execute(new HandleMsg(clientSocket));
-            }catch (IOException e){
-                e.printStackTrace();
+        try{
+            while (true){
+                try{
+                    clientSocket = echoService.accept();
+                    System.out.println(clientSocket.getRemoteSocketAddress()+"connect!");
+//                    new Thread(new HandleMsg(clientSocket)).start();
+                    tp.execute(new HandleMsg(clientSocket));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }finally {
+            if(null!=echoService){
+                System.out.println("echoService stop ...");
+                echoService.close();
             }
         }
     }
