@@ -1,5 +1,8 @@
 package com.zyz.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,51 +18,54 @@ import java.util.concurrent.Executors;
  */
 public class EchoClient {
 
-    private static ExecutorService tp = Executors.newCachedThreadPool();
+    Logger LOGGER = LoggerFactory.getLogger(EchoClient.class);
 
-     class SimpleClient implements Runnable{
+    private static ExecutorService tp = Executors.newFixedThreadPool(10);
 
-         private String clientName;
+    class SimpleClient implements Runnable {
 
-         public SimpleClient(String clientName){
+        private String clientName;
+
+        public SimpleClient(String clientName) {
             this.clientName = clientName;
-         }
+        }
 
         public void run() {
             Socket client = null;
             PrintWriter writer = null;
             BufferedReader reader = null;
             try {
+                System.out.println("from service1: ");
                 client = new Socket();
-                client.connect(new InetSocketAddress("localhost",8000));
+                client.connect(new InetSocketAddress("localhost", 8000));
                 writer = new PrintWriter(client.getOutputStream());
                 writer.print("Hello!");
-                this.sleep(1000L);
+                this.sleep(10L);
                 writer.print(" I ");
-                this.sleep(1000L);
+                this.sleep(10L);
                 writer.print(" am ");
-                this.sleep(1000L);
+                this.sleep(10L);
                 writer.print(this.clientName);
                 writer.println();
                 writer.flush();
                 reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                System.out.println("from service: "+ reader.readLine());
-            }catch (UnknownHostException e){
+                LOGGER.info("from service: " + reader.readLine());
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
-                if(null!=writer){
+            } finally {
+                if (null != writer) {
                     writer.close();
                 }
-                if(null!=reader){
+                if (null != reader) {
                     try {
                         reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                if(null!=client){
+                if (null != client) {
                     try {
                         client.close();
                     } catch (IOException e) {
@@ -69,23 +75,23 @@ public class EchoClient {
             }
         }
 
-         private void sleep(Long millis){
-             try {
-                 Thread.sleep(millis);
-             } catch (InterruptedException e) {
-                 e.printStackTrace();
-             }
-         }
+        private void sleep(Long millis) {
+            try {
+                Thread.sleep(millis);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
-    public  void buildSimpleClient(){
-        for (int i=0;i<1;i++){
-            tp.execute(new SimpleClient("client"+i));
+
+    public void buildSimpleClient() {
+        for (int i = 0; i < 10; i++) {
+            tp.execute(new SimpleClient("client" + i));
         }
     }
 
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         EchoClient client = new EchoClient();
         client.buildSimpleClient();
     }
