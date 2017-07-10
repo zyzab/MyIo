@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * NIO Server
  * Created by zyz on 2016/11/15.
  */
 public class NioThreadEchoService {
@@ -25,7 +26,7 @@ public class NioThreadEchoService {
 
     private Selector selector;
 
-    private ExecutorService tp = Executors.newCachedThreadPool();
+    private ExecutorService tp = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private static Map<Socket, Long> timeStartMap = new HashMap<Socket, Long>();
 

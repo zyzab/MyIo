@@ -35,21 +35,20 @@ public class EchoClient {
             PrintWriter writer = null;
             BufferedReader reader = null;
             try {
-                System.out.println("from service1: ");
                 client = new Socket();
                 client.connect(new InetSocketAddress("localhost", 8000));
                 writer = new PrintWriter(client.getOutputStream());
                 writer.print("Hello!");
-                this.sleep(10L);
+                this.sleep(1000L);
                 writer.print(" I ");
-                this.sleep(10L);
+                this.sleep(1000L);
                 writer.print(" am ");
-                this.sleep(10L);
+                this.sleep(1000L);
                 writer.print(this.clientName);
                 writer.println();
                 writer.flush();
                 reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                LOGGER.info("from service: " + reader.readLine());
+                LOGGER.info("from service: {}",reader.readLine());
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
