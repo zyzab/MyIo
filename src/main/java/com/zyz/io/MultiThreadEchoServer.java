@@ -56,6 +56,7 @@ public class MultiThreadEchoServer {
                         os.close();
                     }
                     clientSocket.close();
+                    tp.shutdown();
                 } catch (IOException e) {
                     LOGGER.error("close Sockect error　{}", e);
                 }

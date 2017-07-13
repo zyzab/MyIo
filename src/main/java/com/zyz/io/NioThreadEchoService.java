@@ -3,16 +3,16 @@ package com.zyz.io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,89 +46,21 @@ public class NioThreadEchoService {
                 iterator.remove();
 
                 if (selectionKey.isAcceptable()) {
-                    this.doAccept(selectionKey);
+                    NioUtil.doAccept(selectionKey,selector);
                 } else if (selectionKey.isValid() && selectionKey.isReadable()) {
                     Long startTime = timeStartMap.get(((SocketChannel) (selectionKey.channel())).socket());
                     if (null == startTime) {
                         timeStartMap.put(((SocketChannel) (selectionKey.channel())).socket(), System.currentTimeMillis());
                     }
-                    this.doRead(selectionKey);
+                    NioUtil.doRead(selectionKey);
                 } else if (selectionKey.isValid() && selectionKey.isWritable()) {
-                    this.doWriter(selectionKey);
+                    NioUtil.doWriter(selectionKey);
                     LOGGER.info("spend: =>{} ms", (System.currentTimeMillis() - timeStartMap.get(((SocketChannel) (selectionKey.channel())).socket())));
                 }
 
             }
         }
 
-    }
-
-    private void doAccept(SelectionKey selectionKey) {
-        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
-        SocketChannel socketChannel;
-        try {
-            socketChannel = serverSocketChannel.accept();
-            socketChannel.configureBlocking(false);
-            SelectionKey readSelectionKey = socketChannel.register(selector, SelectionKey.OP_READ);
-            EchoClientMsg echoClientMsg = new EchoClientMsg();
-            readSelectionKey.attach(echoClientMsg);
-
-            InetAddress clientAddress = socketChannel.socket().getInetAddress();
-            LOGGER.info("Accepted connection from {}",clientAddress.getHostAddress());
-        } catch (Exception e) {
-            LOGGER.error("Failed to accept new client {}",e);
-        }
-    }
-
-    private void doRead(SelectionKey selectionKey) {
-        SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
-        ByteBuffer bb = ByteBuffer.allocate(8192);
-        int len;
-        try {
-            len = socketChannel.read(bb);
-            if (len < 0) {
-                this.disconnect(selectionKey);
-                return;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to read to client. {}",e);
-            this.disconnect(selectionKey);
-        }
-        bb.flip();
-        tp.execute(new HandleMsg(selectionKey, bb));
-    }
-
-    private void doWriter(SelectionKey selectionKey) {
-        SocketChannel channel = (SocketChannel) selectionKey.channel();
-        EchoClientMsg echoClientMsg = (EchoClientMsg) selectionKey.attachment();
-        LinkedList<ByteBuffer> outq = echoClientMsg.getOutq();
-        ByteBuffer bb = outq.getLast();
-        try {
-            int len = channel.write(bb);
-            if (len == -1) {
-                this.disconnect(selectionKey);
-                return;
-            }
-            if (bb.remaining() == 0) {
-                outq.removeLast();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to write to client {}" ,e);
-            this.disconnect(selectionKey);
-        }
-        if (outq.size() == 0) {
-            selectionKey.interestOps(SelectionKey.OP_READ);
-        }
-    }
-
-    private void disconnect(SelectionKey selectionKey) {
-        if (null != selectionKey) {
-            try {
-                selectionKey.channel().close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public static void main(String[] args) {

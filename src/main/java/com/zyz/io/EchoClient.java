@@ -20,7 +20,7 @@ public class EchoClient {
 
     Logger LOGGER = LoggerFactory.getLogger(EchoClient.class);
 
-    private static ExecutorService tp = Executors.newFixedThreadPool(10);
+    private static ExecutorService tp = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     class SimpleClient implements Runnable {
 
@@ -84,7 +84,7 @@ public class EchoClient {
     }
 
     public void buildSimpleClient() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
             tp.execute(new SimpleClient("client" + i));
         }
     }
