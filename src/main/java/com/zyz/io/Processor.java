@@ -28,7 +28,9 @@ public class Processor {
     }
 
     public void addChannel(SocketChannel socketChannel) throws ClosedChannelException {
-        socketChannel.register(this.selector, SelectionKey.OP_READ);
+        SelectionKey readSelectionKey = socketChannel.register(this.selector, SelectionKey.OP_READ);
+        EchoClientMsg echoClientMsg = new EchoClientMsg();
+        readSelectionKey.attach(echoClientMsg);
     }
 
     public void wakeup() {
