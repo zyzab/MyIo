@@ -27,30 +27,35 @@ public class ThreadPoolService {
         return ThreadPoolServiceHolder.INSTANCE;
     }
 
+
+    private Thread newThread(){
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    //Thread.sleep(10000L);
+                    while (true){
+                        //LOGGER.info("Thread=>{}  status=>{} ",Thread.currentThread().getName(),Thread.currentThread().isInterrupted());
+                        if(Thread.currentThread().isInterrupted()){
+                            LOGGER.info("Thread=>{} Interrupted status=>{} ",Thread.currentThread().getName(),Thread.currentThread().isInterrupted());
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("InterruptedException! ",e);
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+        return thread;
+    }
+
     public static void main(String[] args) {
 
         ExecutorService executorService = new ThreadPoolExecutor(1, 1,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(2),new InfoRejectedExecutionHandler());
 
-
-
         for(int i=0;i<10;i++){
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        //Thread.sleep(10000L);
-                        while (true){
-                            if(Thread.isInterrupted()){
-
-                            }
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("InterruptedException! ",e);
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            });
+            Thread thread = ThreadPoolService.getInstance().newThread();
             thread.setName("Thread"+i);
             executorService.submit(thread);
         }
