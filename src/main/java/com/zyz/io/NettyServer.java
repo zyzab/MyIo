@@ -34,7 +34,7 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new DiscardServerHandler());
+                            socketChannel.pipeline().addLast(new TimeServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG,128)
@@ -54,7 +54,7 @@ public class NettyServer {
         if(args.length>0){
             port = Integer.parseInt(args[0]);
         }else{
-            port = 8000;
+            port = 8080;
         }
         new NettyServer(port).run();
     }
