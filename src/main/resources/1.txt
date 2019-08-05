@@ -1,0 +1,11 @@
+LogBenchmark.test  thrpt       2.391          ops/ms
+LogBenchmark.test  thrpt       3.001          ops/ms
+
+LogBenchmark.test  thrpt       4.708          ops/ms
+LogBenchmark.test  thrpt       7.515          ops/ms
+
+
+
+LogBenchmark.test  thrpt       1484.505          ops/ms
+LogBenchmark.test  thrpt       405.056          ops/ms
+

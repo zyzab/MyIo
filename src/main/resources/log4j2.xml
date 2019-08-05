@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug" strict="true" schema="Log4J-V2.2.xsd">
+    <Properties>
+        <Property name="busLogFile">/data/logs/app/MyIo/MyIo.log</Property>
+        <Property name="fileName">/Users/yaozheng/IdeaProjects/MyIo/logs/log4j2.log</Property>
+    </Properties>
+    <!--<Filter type="ThresholdFilter" level="INFO"/>-->
+    <Appenders>
+        <!--<Appender type="Console" name="STDOUT">-->
+            <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%X{trace_id}][%t]%l-%m%n" />-->
+        <!--</Appender>-->
+        <!--<RollingFile name="busLogFile" fileName="${busLogFile}" filePattern="${busLogFile}.%d{yyyy-MM-dd}.gz">-->
+            <!--<Layout type="PatternLayout">-->
+                <!--<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%X{trace_id}][%t]%l-%m%n</Pattern>-->
+            <!--</Layout>-->
+            <!--<Policies>-->
+                <!--<TimeBasedTriggeringPolicy interval="1" modulate="true" />-->
+            <!--</Policies>-->
+        <!--</RollingFile>-->
+        <RandomAccessFile name="INFO" fileName="${fileName}" immediateFlush="false" append="true">
+            <PatternLayout>%d %p %C [%t] %m%n</PatternLayout>
+        </RandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <!--<logger name="org.spring" level="error" additivity="false">-->
+            <!--<AppenderRef ref="STDOUT" />-->
+            <!--&lt;!&ndash;<AppenderRef ref="busLogFile" />&ndash;&gt;-->
+        <!--</logger>-->
+        <!--<logger name="org.springframework" level="error" additivity="false">-->
+            <!--<AppenderRef ref="STDOUT" />-->
+            <!--&lt;!&ndash;<AppenderRef ref="busLogFile" />&ndash;&gt;-->
+        <!--</logger>-->
+        <!--<logger name="com.alibaba.rocketmq" level="error" additivity="false">-->
+            <!--&lt;!&ndash;<AppenderRef ref="busLogFile" />&ndash;&gt;-->
+            <!--<AppenderRef ref="STDOUT" />-->
+        <!--</logger>-->
+        <!--<logger name="org.apache.zookeeper" level="error" additivity="false">-->
+            <!--<AppenderRef ref="STDOUT" />-->
+            <!--&lt;!&ndash;<AppenderRef ref="busLogFile" />&ndash;&gt;-->
+        <!--</logger>-->
+
+        <!--<Root  level="INFO">-->
+            <!--<AppenderRef ref="INFO"/>-->
+        <!--</Root>-->
+        <AsyncRoot level="INFO" additivity="false" includeLocation="true" bufferSize="100">
+            <AppenderRef ref="INFO"/>
+        </AsyncRoot>
+    </Loggers>
+
+</Configuration>
