@@ -25,6 +25,7 @@ public class Processor {
 
     public Processor() throws IOException {
         this.selector = Selector.open();
+        start();
     }
 
     public void addChannel(SocketChannel socketChannel) throws ClosedChannelException {
@@ -35,7 +36,6 @@ public class Processor {
 
     public void wakeup() {
         this.selector.wakeup();
-        start();
     }
 
 
@@ -49,7 +49,9 @@ public class Processor {
         public void run() {
             while (true) {
                 try {
-                    selector.select();
+                    if (selector.select(500) <= 0) {
+                        continue;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

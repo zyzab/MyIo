@@ -130,5 +130,12 @@ public class IdWorker {
         BigInteger src = new BigInteger(a, 2);//转换为BigInteger类型
         System.out.println(src.toString());//转换为2进制并输出结果
 
+
+        System.out.println(iw1.nextId());
+        System.out.println(iw1.nextId());
+        System.out.println(iw1.nextId());
+        System.out.println( (-1L<< 10L));
+        System.out.println( -1L ^ (-1L<< 10L));
+
     }
 }

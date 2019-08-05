@@ -36,7 +36,7 @@ public class EchoClient {
             BufferedReader reader = null;
             try {
                 client = new Socket();
-                client.connect(new InetSocketAddress("localhost", 8000));
+                client.connect(new InetSocketAddress("localhost", 8080));
                 writer = new PrintWriter(client.getOutputStream());
                 writer.print("Hello!");
                 this.sleep(1000L);

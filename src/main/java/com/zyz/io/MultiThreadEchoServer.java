@@ -68,7 +68,7 @@ public class MultiThreadEchoServer {
     public static void main(String[] args) throws IOException {
         Socket clientSocket = null;
         try {
-            echoService = new ServerSocket(8000);
+            echoService = new ServerSocket(8080);
         } catch (IOException e) {
             e.printStackTrace();
         }
