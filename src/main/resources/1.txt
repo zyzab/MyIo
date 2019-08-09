@@ -6,6 +6,18 @@ LogBenchmark.test  thrpt       7.515          ops/ms
 
 
 
-LogBenchmark.test  thrpt       1484.505          ops/ms
-LogBenchmark.test  thrpt       405.056          ops/ms
+LogBenchmark.test  thrpt       15.245          ops/ms
+LogBenchmark.test  thrpt       313.686          ops/ms
+LogBenchmark.test  thrpt       475.941          ops/ms
+
+
+
+ArrayBlockingQueueBenchmark.sendOneM  thrpt       9.370          ops/ms
+LMAXDisruptorBenchmark.addOneM  thrpt       8.309          ops/ms
+LMAXDisruptorBenchmark.addOneM  thrpt       7.544          ops/ms
+
+
+LMAXDisruptorBenchmark.addOneM  thrpt       6.902          ops/ms
+
+
 

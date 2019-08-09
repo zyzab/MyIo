@@ -30,6 +30,15 @@ public class StringBuilderBenchmark {
         print(sb.toString());
     }
 
+    @Benchmark
+    public void testStringBufferAdd() {
+        StringBuffer a = new StringBuffer();
+        for (int i = 0; i < 10; i++) {
+            a.append(i);
+        }
+        print(a.toString());
+    }
+
     private void print(String a) {
     }
 }

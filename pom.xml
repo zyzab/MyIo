@@ -28,6 +28,12 @@
             <version>3.3.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.revinate</groupId>
+            <artifactId>guava-rate-limiter</artifactId>
+            <version>19.0</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.slf4j</groupId>-->
             <!--<artifactId>slf4j-api</artifactId>-->
