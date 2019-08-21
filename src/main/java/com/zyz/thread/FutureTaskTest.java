@@ -1,5 +1,6 @@
 package com.zyz.thread;
 
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,55 @@ import java.util.concurrent.*;
 public class FutureTaskTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FutureTaskTest.class);
+
+
+    /**
+     * 洗水壶，烧开水，泡茶
+     */
+    static class T1Task implements Callable<String>{
+
+        FutureTask<String> ft2;
+
+        T1Task(FutureTask<String> ft2){
+            this.ft2 = ft2;
+        }
+
+        public String call() throws Exception {
+            LOGGER.info("T1: 洗水壶...");
+            TimeUnit.SECONDS.sleep(1);
+
+            LOGGER.info("T1: 烧开水...");
+            TimeUnit.SECONDS.sleep(15);
+
+            //阻塞获取T2线程的茶叶
+            String tf = ft2.get();
+            LOGGER.info("T1: 拿到茶叶:"+tf);
+
+            LOGGER.info("T1: 泡茶...");
+            TimeUnit.SECONDS.sleep(1);
+
+            return " 上茶:"+tf;
+        }
+    }
+
+    /**
+     * 洗茶壶，洗茶杯，拿茶叶
+     */
+    static class T2Task implements Callable<String>{
+
+        public String call() throws Exception {
+            LOGGER.info("T2: 洗茶壶...");
+            TimeUnit.SECONDS.sleep(1);
+
+            LOGGER.info("T2: 洗茶杯...");
+            TimeUnit.SECONDS.sleep(1);
+
+            LOGGER.info("T2: 拿茶叶...");
+            TimeUnit.SECONDS.sleep(1);
+
+            return " 龙井 ";
+        }
+    }
 
     static Integer result = null;
 
@@ -70,10 +120,30 @@ public class FutureTaskTest {
         }
     }
 
+    public static void paocha(){
+        FutureTask<String> ft2 = new FutureTask<String>(new T2Task());
+        FutureTask<String> ft1 = new FutureTask<String>(new T1Task(ft2));
+
+        Thread t1 = new Thread(ft1);
+        Thread t2 = new Thread(ft2);
+
+        t1.start();
+        t2.start();
+
+        try {
+            LOGGER.info(" "+ft1.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public static void main(String[] args) throws Exception{
-        test1();
+//        test1();
+        paocha();
     }
 
 }
