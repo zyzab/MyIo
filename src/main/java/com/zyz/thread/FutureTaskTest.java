@@ -3,7 +3,10 @@ package com.zyz.thread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 public class FutureTaskTest {
 
@@ -120,8 +123,8 @@ public class FutureTaskTest {
     }
 
     public static void paocha(){
-        FutureTask<String> ft2 = new FutureTask<String>(new T2Task());
-        FutureTask<String> ft1 = new FutureTask<String>(new T1Task(ft2));
+        FutureTask<String> ft2 = new FutureTask<>(new T2Task());
+        FutureTask<String> ft1 = new FutureTask<>(new T1Task(ft2));
 
         Thread t1 = new Thread(ft1);
         Thread t2 = new Thread(ft2);
