@@ -1,6 +1,5 @@
 package com.zyz.thread;
 
-import jdk.nashorn.internal.codegen.CompilerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
