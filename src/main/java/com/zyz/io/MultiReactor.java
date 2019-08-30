@@ -31,7 +31,7 @@ public class MultiReactor {
 
         ServerSocketChannel ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
-        ssc.socket().bind(new InetSocketAddress(8000));
+        ssc.socket().bind(new InetSocketAddress(8080));
         selector = Selector.open();
         ssc.register(selector, SelectionKey.OP_ACCEPT);
         int index = 0;
