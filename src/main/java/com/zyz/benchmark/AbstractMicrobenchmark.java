@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the JMH microbenchmark adapter.  There may be context switches introduced by this harness.
@@ -18,15 +20,17 @@ import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 @Fork(AbstractMicrobenchmark.DEFAULT_FORKS)
 public class AbstractMicrobenchmark extends AbstractMicrobenchmarkBase {
 
-    protected static final int DEFAULT_FORKS = 2;
+    private final Logger logger = LoggerFactory.getLogger(AbstractMicrobenchmark.class);
+
+    protected static final int DEFAULT_FORKS = 1;
 
     public static final class HarnessExecutor extends ThreadPoolExecutor {
         private final  InternalLogger logger = InternalLoggerFactory.getInstance(AbstractMicrobenchmark.class);
 
         public HarnessExecutor(int maxThreads, String prefix) {
             super(maxThreads, maxThreads, 0, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(), new DefaultThreadFactory(prefix));
-            logger.debug("Using harness executor");
+                    new LinkedBlockingQueue<>(), new DefaultThreadFactory(prefix));
+            logger.info("Using harness executor");
         }
     }
 
@@ -41,20 +45,19 @@ public class AbstractMicrobenchmark extends AbstractMicrobenchmarkBase {
     }
 
     public AbstractMicrobenchmark(boolean disableAssertions, boolean disableHarnessExecutor) {
-        System.out.println(disableHarnessExecutor);
+        logger.info("disableAssertions=[{}],disableHarnessExecutor=[{}]",disableAssertions,disableHarnessExecutor);
         final String[] customArgs;
         if (disableHarnessExecutor) {
             customArgs = new String[]{"-Xms768m", "-Xmx768m", "-XX:MaxDirectMemorySize=768m"};
         } else {
             customArgs = new String[]{"-Xms768m", "-Xmx768m", "-XX:MaxDirectMemorySize=768m", "-Djmh.executor=CUSTOM",
-                    "-Djmh.executor.class=io.netty.microbench.util.AbstractMicrobenchmark$HarnessExecutor"};
+                    "-Djmh.executor.class=com.zyz.benchmark.AbstractMicrobenchmark$HarnessExecutor"};
         }
         String[] jvmArgs = new String[BASE_JVM_ARGS.length + customArgs.length];
         System.arraycopy(BASE_JVM_ARGS, 0, jvmArgs, 0, BASE_JVM_ARGS.length);
         System.arraycopy(customArgs, 0, jvmArgs, BASE_JVM_ARGS.length, customArgs.length);
-        if (disableAssertions) {
-            jvmArgs = removeAssertions(jvmArgs);
-        }
+
+        logger.info("jvmArgs=[{}]",jvmArgs);
         this.jvmArgs = jvmArgs;
     }
 
@@ -69,7 +72,7 @@ public class AbstractMicrobenchmark extends AbstractMicrobenchmarkBase {
         if (getForks() > 0) {
             runnerOptions.forks(getForks());
         }
-
+        logger.info("runnerOptions1=[{}]",runnerOptions);
         return runnerOptions;
     }
 

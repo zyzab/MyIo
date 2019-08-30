@@ -1,28 +1,23 @@
 package com.zyz.benchmark;
 
-import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.FastThreadLocal;
-import io.netty.util.internal.SystemPropertyUtil;
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-@Warmup(iterations = 0)
+@Threads(4)
 @Measurement(iterations = 1, batchSize = 100)
-@Threads(1)
-@State(Scope.Thread)
 public class FastThreadLocalBenchmark extends AbstractMicrobenchmark {
 
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(FastThreadLocalBenchmark.class);
+    private static final Logger logger = LoggerFactory.getLogger(FastThreadLocalBenchmark.class);
 
     private static final Random rand = new Random();
 
@@ -49,8 +44,20 @@ public class FastThreadLocalBenchmark extends AbstractMicrobenchmark {
         }
     }
 
-    public FastThreadLocalBenchmark() {
-        super(false, false);
+    public static void main(String[] args) throws Exception {
+      //  FastThreadLocalBenchmark fastThreadLocalBenchmark = new FastThreadLocalBenchmark();
+//        Options options = fastThreadLocalBenchmark.newOptionsBuilder().build();
+//        logger.info("options=[{}]",options);
+
+
+        Options opt = new OptionsBuilder()
+                .include(FastThreadLocalBenchmark.class.getSimpleName())
+                .forks(1)
+                .warmupIterations(5).jvmArgs("-Djmh.executor.class=com.zyz.benchmark.AbstractMicrobenchmark$HarnessExecutor")
+                .measurementIterations(2)
+                .build();
+        Collection<RunResult> results =  new Runner(opt).run();
+
     }
 
     @Benchmark
@@ -65,50 +72,6 @@ public class FastThreadLocalBenchmark extends AbstractMicrobenchmark {
         for (FastThreadLocal<Integer> i: fastThreadLocals) {
             bh.consume(i.get());
         }
-    }
-
-    public static final class HarnessExecutor extends ThreadPoolExecutor {
-        public HarnessExecutor(int maxThreads, String prefix) {
-            super(maxThreads, maxThreads, 0, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(), new DefaultThreadFactory(prefix));
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        FastThreadLocalBenchmark fastThreadLocalBenchmark = new FastThreadLocalBenchmark();
-
-        new Runner(fastThreadLocalBenchmark.newOptionsBuilder().build()).run();
-    }
-
-
-
-    public void run() throws Exception {
-        logger.info("zyz");
-        System.out.println("zyzab");
-        new Runner(newOptionsBuilder().build()).run();
-    }
-
-    protected  ChainedOptionsBuilder newOptionsBuilder1() throws Exception {
-        String className = getClass().getSimpleName();
-        final String[] customArgs  = new String[]{"-Xms768m", "-Xmx768m", "-XX:MaxDirectMemorySize=768m", "-Djmh.executor=CUSTOM",
-                "-Djmh.executor.class=com.zyz.benchmark.FastThreadLocalBenchmark$HarnessExecutor"};
-        ChainedOptionsBuilder runnerOptions = new OptionsBuilder()
-                .include(".*" + className + ".*")
-                .jvmArgs(customArgs);
-        return runnerOptions;
-    }
-
-    protected ChainedOptionsBuilder newOptionsBuilder() throws Exception {
-        ChainedOptionsBuilder runnerOptions = newOptionsBuilder1();
-        if (getForks() > 0) {
-            runnerOptions.forks(getForks());
-        }
-
-        return runnerOptions;
-    }
-
-    protected int getForks() {
-        return SystemPropertyUtil.getInt("forks", -1);
     }
 
 }

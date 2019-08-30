@@ -15,6 +15,8 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all JMH benchmarks.
@@ -23,15 +25,14 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @Measurement(iterations = AbstractMicrobenchmarkBase.DEFAULT_MEASURE_ITERATIONS)
 @State(Scope.Thread)
 public abstract class AbstractMicrobenchmarkBase {
-    protected static final int DEFAULT_WARMUP_ITERATIONS = 10;
-    protected static final int DEFAULT_MEASURE_ITERATIONS = 10;
-    protected static final String[] BASE_JVM_ARGS = {
-            "-server", "-dsa", "-da", "-ea:io.netty...",
-            "-XX:+HeapDumpOnOutOfMemoryError", "-Dio.netty.leakDetection.level=disabled"};
 
-    static {
-        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
-    }
+    private final Logger logger = LoggerFactory.getLogger(AbstractMicrobenchmarkBase.class);
+
+    protected static final int DEFAULT_WARMUP_ITERATIONS = 1;
+    protected static final int DEFAULT_MEASURE_ITERATIONS = 1;
+    protected static final String[] BASE_JVM_ARGS = {
+            "-server",
+            "-XX:+HeapDumpOnOutOfMemoryError"};
 
     protected ChainedOptionsBuilder newOptionsBuilder() throws Exception {
         String className = getClass().getSimpleName();
@@ -61,14 +62,14 @@ public abstract class AbstractMicrobenchmarkBase {
             runnerOptions.resultFormat(ResultFormatType.JSON);
             runnerOptions.result(filePath);
         }
-
+        logger.info("runnerOptions=[{}]",runnerOptions);
         return runnerOptions;
     }
 
     protected abstract String[] jvmArgs();
 
     protected static String[] removeAssertions(String[] jvmArgs) {
-        List<String> customArgs = new ArrayList<String>(jvmArgs.length);
+        List<String> customArgs = new ArrayList<>(jvmArgs.length);
         for (String arg : jvmArgs) {
             if (!arg.startsWith("-ea")) {
                 customArgs.add(arg);
@@ -79,8 +80,6 @@ public abstract class AbstractMicrobenchmarkBase {
         }
         return jvmArgs;
     }
-
-
 
     protected int getWarmupIterations() {
         return SystemPropertyUtil.getInt("warmupIterations", -1);
@@ -93,6 +92,5 @@ public abstract class AbstractMicrobenchmarkBase {
     protected String getReportDir() {
         return SystemPropertyUtil.get("perfReportDir");
     }
-
 
 }
